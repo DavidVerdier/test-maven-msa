@@ -1,17 +1,45 @@
 package com.test.test.controller;
 
+import com.test.test.dao.ProductDao;
 import com.test.test.model.Product;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
 public class ProductController {
 
+    @Autowired
+    private ProductDao productDao;
+
+    @GetMapping(value = "products")
+    public List<Product> listProducts() {
+        return productDao.findAll();
+    }
+
     @GetMapping(value = "product/{id}")
     public Product showProduct(@PathVariable int id) {
-        Product product = new Product(id, "mon produit", 100);
+        return productDao.findById(id);
+    }
 
-        return product;
+    @PostMapping(value = "/product")
+    public ResponseEntity<Void> addProduct(@RequestBody Product product) {
+        Product product1 = productDao.save(product);
+
+        if (null == product) {
+            return ResponseEntity.noContent().build();
+        }
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id]")
+                .buildAndExpand(product1.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 }
