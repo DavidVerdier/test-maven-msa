@@ -42,4 +42,9 @@ public class ProductController {
 
         return ResponseEntity.created(location).build();
     }
+
+    @GetMapping(value = "products/{prixLimit}")
+    public List<Product> showProductByPrice(@PathVariable int prixLimit) {
+        return productDao.chercherUnProduitCher(prixLimit);//  .findByPrixGreaterThan(prixLimit);
+    }
 }
